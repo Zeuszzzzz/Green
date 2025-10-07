@@ -9,7 +9,7 @@ Content: question;numoption;numoption;numoption;numoption;|
     - 2 == to be decided
 
 ### TODO
-- show the right answer
+- ~~show the right answer~~
 - randomized questions
 - randomized question choices
 - quiz maker

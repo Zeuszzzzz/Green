@@ -1,3 +1,4 @@
+
 export function nextQuestion() {
     localStorage.Current_Question = Number.parseInt(localStorage.Current_Question)+1;
     let num = localStorage.Current_Question;

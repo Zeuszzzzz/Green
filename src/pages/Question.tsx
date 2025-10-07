@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Menubar from "../components/Menubar";
+import { nextQuestion } from "../utils/Questions";
+import { Upper } from "../utils/String";
 
 function Question() {
     const [mainBarHeight, setMainBarHeight] = useState(0);
@@ -47,17 +49,25 @@ function Question() {
             [&>*:not(:first-child)]:hover:cursor-pointer`}
             >
                 <label className="font-bold">{questionData.Question}</label>
-                <button type="button" className="hover:bg-white" name="Option_1" onClick={correctOrNot}>
-                    {questionData.Option_1.substring(1)}
+                <button type="button" className="hover:bg-white" name="Option" id="Option_1" onClick={showAnswer}>
+                    {Upper(questionData.Option_1.substring(1))}
                 </button>
-                <button type="button" className="hover:bg-white" name="Option_2" onClick={correctOrNot}>
-                    {questionData.Option_2.substring(1)}
+                <button type="button" className="hover:bg-white" name="Option" id="Option_2" onClick={showAnswer}>
+                    {Upper(questionData.Option_2.substring(1))}
                 </button>
-                <button type="button" className="hover:bg-white" name="Option_3" onClick={correctOrNot}>
-                    {questionData.Option_3.substring(1)}
+                <button type="button" className="hover:bg-white" name="Option" id="Option_3" onClick={showAnswer}>
+                    {Upper(questionData.Option_3.substring(1))}
                 </button>
-                <button type="button" className="hover:bg-white" name="Option_4" onClick={correctOrNot}>
-                    {questionData.Option_4.substring(1)}
+                <button type="button" className="hover:bg-white" name="Option" id="Option_4" onClick={showAnswer}>
+                    {Upper(questionData.Option_4.substring(1))}
+                </button>
+                <button
+                    type="button"
+                    className="bg-gray-700 text-white hover:cursor-pointer hidden"
+                    onClick={()=>{nextQuestion(); location.reload()}}
+                    id="Next"
+                >
+                    Next Question
                 </button>
                 <a href="/Correct" className="hidden" id="Correct"></a>
                 <a href="/Wrong" className="hidden" id="Wrong"></a>
@@ -66,21 +76,22 @@ function Question() {
     );
 }
 
-function correctOrNot(event: React.MouseEvent<HTMLButtonElement>){
-    const btn = event.currentTarget;
-    
-    
-    console.log(localStorage.getItem(btn.name)?.substring(0,1));
-    switch(localStorage.getItem(btn.name)?.substring(0,1)){
-        case "0":
-            document.getElementById("Wrong")?.click();
-            break;
-        case "1":
-            document.getElementById("Correct")?.click();
-            break;
-        default:
-            location.reload();
-    }
+function showAnswer(){
+    document.getElementsByName("Option").forEach((btn)=>{
+        let answer = localStorage.getItem(btn.id)?.substring(0,1);
+        let color = "";
+        switch(answer){
+            case "0":
+                color = "#a37c88";
+                break;
+            case "1":
+                color = "#647253";
+                break;
+            }
+        btn.style.backgroundColor = color;
+        let nextQuestion = document.getElementById("Next");
+        if(nextQuestion) nextQuestion.style.display = "inline"
+    });
 }
 
 export default Question;
