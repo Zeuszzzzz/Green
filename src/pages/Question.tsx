@@ -1,97 +1,99 @@
 import { useEffect, useState } from "react";
 import Menubar from "../components/Menubar";
-import { nextQuestion } from "../utils/Questions";
+import { nextQuestion, randomQuestion } from "../utils/Questions";
 import { Upper } from "../utils/String";
 
 function Question() {
     const [mainBarHeight, setMainBarHeight] = useState(0);
     const [questionData, setQuestionData] = useState({
+        Randomize: "",
         Current_Question: "",
         Question: "",
         Option_1: "",
         Option_2: "",
         Option_3: "",
-        Option_4: ""
+        Option_4: "",
     });
 
     useEffect(() => {
+        // Initialize defaults only once
         if (!localStorage.getItem("Question")) {
-            localStorage.setItem("Current_Question","-1")
+            localStorage.setItem("Current_Question", "-2");
             localStorage.setItem("Question", "Question");
-            localStorage.setItem("Option_1", "2option-1");
-            localStorage.setItem("Option_2", "2option-2");
-            localStorage.setItem("Option_3", "2option-3");
-            localStorage.setItem("Option_4", "2option-4");
-        };
+            localStorage.setItem("Option_1", "0option-1");
+            localStorage.setItem("Option_2", "0option-2");
+            localStorage.setItem("Option_3", "0option-3");
+            localStorage.setItem("Option_4", "0option-4");
+        }
 
         setQuestionData({
-            Current_Question: localStorage.Current_Question,
-            Question: localStorage.Question,
-            Option_1: localStorage.Option_1,
-            Option_2: localStorage.Option_2,
-            Option_3: localStorage.Option_3,
-            Option_4: localStorage.Option_4,
+            Randomize: localStorage.Randomize ?? "false",
+            Current_Question: localStorage.Current_Question ?? "-2",
+            Question: localStorage.Question ?? "",
+            Option_1: localStorage.Option_1 ?? "",
+            Option_2: localStorage.Option_2 ?? "",
+            Option_3: localStorage.Option_3 ?? "",
+            Option_4: localStorage.Option_4 ?? "",
         });
 
         const bar = document.getElementById("mainBar");
         if (bar) setMainBarHeight(bar.offsetHeight);
     }, []);
 
+    const showAnswer = () => {
+        document.getElementsByName("Option").forEach((btn) => {
+            const el = btn as HTMLButtonElement;
+            const prefix = localStorage.getItem(el.id)?.[0];
+            const color = prefix === "1" ? "#647253" : "#a37c88";
+            el.style.backgroundColor = color;
+        });
+        document.getElementById("Next")?.classList.remove("hidden");
+    };
+
+    const handleNext = () => {
+        if (questionData.Randomize === "true") randomQuestion();
+        else nextQuestion();
+        location.reload();
+    };
+
     return (
         <>
             <Menubar />
             <form
-                action=""
-                method="get"
                 style={{ height: `calc(100vh - ${mainBarHeight}px)` }}
-                className={`flex justify-center items-center flex-col w-screen *:pt-1 *:pb-1 *:rounded-[0.7rem] *:m-1
-            [&>*:not(:first-child)]:border-2
-            [&>*:not(:first-child)]:hover:cursor-pointer`}
+                className="flex flex-col justify-center items-center w-screen *:pt-1 *:pb-1 *:rounded-xl *:m-1 [&>*:not(:first-child)]:border-2 [&>*:not(:first-child)]:hover:cursor-pointer"
             >
                 <label className="font-bold">{questionData.Question}</label>
-                <button type="button" className="hover:bg-white" name="Option" id="Option_1" onClick={showAnswer}>
-                    {Upper(questionData.Option_1.substring(1))}
-                </button>
-                <button type="button" className="hover:bg-white" name="Option" id="Option_2" onClick={showAnswer}>
-                    {Upper(questionData.Option_2.substring(1))}
-                </button>
-                <button type="button" className="hover:bg-white" name="Option" id="Option_3" onClick={showAnswer}>
-                    {Upper(questionData.Option_3.substring(1))}
-                </button>
-                <button type="button" className="hover:bg-white" name="Option" id="Option_4" onClick={showAnswer}>
-                    {Upper(questionData.Option_4.substring(1))}
-                </button>
+
+                {[1, 2, 3, 4].map((n) => (
+                    <button
+                        key={n}
+                        type="button"
+                        id={`Option_${n}`}
+                        name="Option"
+                        onClick={showAnswer}
+                        className="hover:bg-white"
+                    >
+                        {Upper(
+                            questionData[`Option_${n}` as keyof typeof questionData].substring(1)
+                        )}
+                    </button>
+                ))}
+
                 <button
                     type="button"
-                    className="bg-gray-700 text-white hover:cursor-pointer hidden"
-                    onClick={()=>{nextQuestion(); location.reload()}}
                     id="Next"
+                    onClick={handleNext}
+                    className="bg-gray-700 text-white hover:cursor-pointer hidden"
                 >
                     Next Question
                 </button>
+
                 <a href="/Correct" className="hidden" id="Correct"></a>
                 <a href="/Wrong" className="hidden" id="Wrong"></a>
             </form>
         </>
     );
-}
-
-function showAnswer(){
-    document.getElementsByName("Option").forEach((btn)=>{
-        let answer = localStorage.getItem(btn.id)?.substring(0,1);
-        let color = "";
-        switch(answer){
-            case "0":
-                color = "#a37c88";
-                break;
-            case "1":
-                color = "#647253";
-                break;
-            }
-        btn.style.backgroundColor = color;
-        let nextQuestion = document.getElementById("Next");
-        if(nextQuestion) nextQuestion.style.display = "inline"
-    });
 }
 
 export default Question;

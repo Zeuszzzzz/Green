@@ -1,3 +1,3 @@
-export function Upper(text:string):string{
-    return text.substring(0,1).toUpperCase() + text.substring(1);
+export function Upper(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }

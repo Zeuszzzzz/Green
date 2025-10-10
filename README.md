@@ -11,9 +11,11 @@ num -> the option is right or wrong
 - 2 == to be decided
 
 
+
+
 ### TODO
 - ~~show the right answer~~
-- randomized questions
+- ~~randomized questions~~
 - randomized question choices
 - quiz maker
 
