@@ -1,36 +1,6 @@
-import { useEffect, useState } from "react";
-import { nextQuestion, randomQuestion } from "../utils/Questions";
+import { nextQuestion, openFile, randomQuestion } from "../utils/Questions";
 
 function Menubar() {
-    const [randomized, setRandomized] = useState(
-        localStorage.Randomize === "true"
-    );
-
-    useEffect(() => {
-        const openFile = document.getElementById("openFile");
-        openFile?.addEventListener("change", async (event) => {
-            const file = (event.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-
-            const text = await file.text();
-            const temp = text.split("|").map((q) => q.split(";"));
-
-            temp.forEach((q, i) => localStorage.setItem(String(i), JSON.stringify(q)));
-
-            const bank = Array.from({ length: temp.length }, (_, i) => i);
-            localStorage.setItem("Bank", JSON.stringify(bank));
-
-            if (randomized) randomQuestion();
-            else nextQuestion();
-
-            document.getElementById("Home")?.click();
-        });
-    }, [randomized]);
-
-    const reset = () => {
-        localStorage.clear();
-        document.getElementById("Home")?.click();
-    };
 
     return (
         <nav
@@ -49,7 +19,7 @@ function Menubar() {
                 </ul>
             </div>
 
-            <button type="button" onClick={reset}>Reset</button>
+            <button type="button" onClick={()=>{localStorage.clear();document.getElementById("Home")?.click();}}>Reset</button>
 
             <div className="group relative inline-block">
                 <span>Options</span>
@@ -58,7 +28,7 @@ function Menubar() {
                         <input
                             type="checkbox"
                             id="Randomized?"
-                            checked={randomized}
+                            checked={localStorage.Randomize === "true"}
                             onChange={handleRandomizeChange}
                         />
                         <label htmlFor="Randomized?">Randomized</label>
@@ -67,7 +37,7 @@ function Menubar() {
             </div>
 
             <a href="/" className="hidden" id="Home"></a>
-            <input type="file" accept=".quiz" id="openFile" className="hidden" />
+            <input type="file" accept=".quiz" id="openFile" className="hidden" onChange={openFile} />
         </nav>
     );
 }
@@ -76,7 +46,7 @@ function handleRandomizeChange (e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.checked;
     localStorage.setItem("Randomize", String(value));
 
-    localStorage.setItem("Current_Question", "-2");
+    localStorage.setItem("Current_Question", "-1");
 
     const allKeys = Object.keys(localStorage).filter((k) => !isNaN(Number(k)));
     if (allKeys.length > 0) {

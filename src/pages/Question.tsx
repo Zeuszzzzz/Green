@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Menubar from "../components/Menubar";
+import { shuffleArray } from "../utils/Array";
 import { nextQuestion, randomQuestion } from "../utils/Questions";
 import { Upper } from "../utils/String";
 
@@ -16,9 +17,8 @@ function Question() {
     });
 
     useEffect(() => {
-        // Initialize defaults only once
         if (!localStorage.getItem("Question")) {
-            localStorage.setItem("Current_Question", "-2");
+            localStorage.setItem("Current_Question", "-1");
             localStorage.setItem("Question", "Question");
             localStorage.setItem("Option_1", "0option-1");
             localStorage.setItem("Option_2", "0option-2");
@@ -28,7 +28,7 @@ function Question() {
 
         setQuestionData({
             Randomize: localStorage.Randomize ?? "false",
-            Current_Question: localStorage.Current_Question ?? "-2",
+            Current_Question: localStorage.Current_Question ?? "-1",
             Question: localStorage.Question ?? "",
             Option_1: localStorage.Option_1 ?? "",
             Option_2: localStorage.Option_2 ?? "",
@@ -38,24 +38,16 @@ function Question() {
 
         const bar = document.getElementById("mainBar");
         if (bar) setMainBarHeight(bar.offsetHeight);
+        
+        
     }, []);
-
-    const showAnswer = () => {
-        document.getElementsByName("Option").forEach((btn) => {
-            const el = btn as HTMLButtonElement;
-            const prefix = localStorage.getItem(el.id)?.[0];
-            const color = prefix === "1" ? "#647253" : "#a37c88";
-            el.style.backgroundColor = color;
-        });
-        document.getElementById("Next")?.classList.remove("hidden");
-    };
 
     const handleNext = () => {
         if (questionData.Randomize === "true") randomQuestion();
         else nextQuestion();
         location.reload();
     };
-
+    
     return (
         <>
             <Menubar />
@@ -65,7 +57,7 @@ function Question() {
             >
                 <label className="font-bold">{questionData.Question}</label>
 
-                {[1, 2, 3, 4].map((n) => (
+                {shuffleArray([1,2,3,4]).map((n) => (
                     <button
                         key={n}
                         type="button"
@@ -95,5 +87,15 @@ function Question() {
         </>
     );
 }
+
+function showAnswer(){
+    document.getElementsByName("Option").forEach((btn) => {
+        const el = btn as HTMLButtonElement;
+        const prefix = localStorage.getItem(el.id)?.[0];
+        const color = prefix === "1" ? "#647253" : "#a37c88";
+        el.style.backgroundColor = color;
+    });
+    document.getElementById("Next")?.classList.remove("hidden");
+};
 
 export default Question;

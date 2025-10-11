@@ -32,3 +32,18 @@ export function randomQuestion() {
     localStorage.Bank = JSON.stringify(bank);
     localStorage.Current_Question = String(num);
 }
+
+export async function openFile(){
+    const file = (document.getElementById("openFile") as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const temp = text.split("|").map((q) => q.split(";"));
+    temp.forEach((q, i) => localStorage.setItem(String(i), JSON.stringify(q)));
+    
+    const bank = Array.from({ length: temp.length }, (_, i) => i);
+    localStorage.setItem("Bank", JSON.stringify(bank));
+
+    if (localStorage.Randomize === "true") randomQuestion();
+    else nextQuestion();
+    document.getElementById("Home")?.click();
+}
